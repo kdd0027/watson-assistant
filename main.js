@@ -76,7 +76,7 @@ function createSessionID(skillId)
 
 function assistantMessage(request, skillId) {
   return new Promise(function(resolve, reject) {
-    const input = request.intent ? request.intent.name : 'welcome';
+    let input = request.intent ? request.intent.slots.EveryThingSlot.value : 'start skill';
     console.log('SKILL_ID: ' + skillId);
     console.log('Input text: ' + input);
 
@@ -88,7 +88,6 @@ function assistantMessage(request, skillId) {
           'text': input
         },
         assistantId: skillId,
-        context: context,
         sessionId: session_json.result.session_id
       },
       function(err, watsonResponse) {
@@ -101,14 +100,18 @@ function assistantMessage(request, skillId) {
           resolve(watsonResponse);
         }
       }
-    );
+    ).then(res => {
+      console.log("Res: ", JSON.stringify(res.result, null, 2));
+    })
+    .catch(err => {
+      console.log(err);
+    });
   });
 }
 
 function sendResponse(response, resolve) {
   console.log('Begin sendResponse');
   console.log(response);
-  console.log(response.result.output.generic);
 
   // Combine the output messages into one message.
   const output = response.result.output.generic[0].text;
